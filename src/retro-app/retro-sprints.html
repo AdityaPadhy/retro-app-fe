@@ -1,0 +1,27 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="retro-sprints">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: sans-serif;
+      }
+    </style>
+
+    <h1>Show the sprints</h1>
+  </template>
+
+  <script>
+    class RetroSprints extends Polymer.Element {
+      static get is() { return 'retro-sprints'; }
+      static get properties() {
+        return {        
+          rootPath: String
+        };
+      }
+    }
+
+    window.customElements.define(RetroSprints.is, RetroSprints);
+  </script>
+</dom-module>

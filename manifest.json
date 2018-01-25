@@ -1,0 +1,6 @@
+{
+  "name": "retro-app",
+  "short_name": "retro-app",
+  "start_url": "/",
+  "display": "standalone"
+}

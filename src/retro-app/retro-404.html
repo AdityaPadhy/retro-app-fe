@@ -1,0 +1,27 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="retro-404">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: sans-serif;
+      }
+    </style>
+
+    <a href="/">Head back to home</a>
+  </template>
+
+  <script>
+    class Retro404 extends Polymer.Element {
+      static get is() { return 'retro-404'; }
+      static get properties() {
+        return {
+          rootPath: String,
+        };
+      }
+    }
+
+    window.customElements.define(Retro404.is, Retro404);
+  </script>
+</dom-module>
