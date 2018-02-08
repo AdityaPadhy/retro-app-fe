@@ -16,7 +16,14 @@
     "iron-label": "PolymerElements/iron-label#^2.0.0",
     "iron-form": "PolymerElements/iron-form#^2.0.1",
     "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1",
-    "iron-autogrow-textarea": "PolymerElements/iron-autogrow-textarea#^2.1.0"
+    "iron-autogrow-textarea": "PolymerElements/iron-autogrow-textarea#^2.1.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^2.1.0",
+    "paper-datatable-api": "^2.0.12",
+    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^2.3.1",
+    "paper-dialog": "PolymerElements/paper-dialog#^2.0.1",
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.2",
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

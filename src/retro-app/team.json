@@ -1,0 +1,20 @@
+[
+    {
+        "id" : 1,
+        "name": "Aditya",
+        "email": "aditya.padhy@ing.com",
+        "role": "developer"
+    },
+    {
+        "id" : 2,
+        "name": "Aditya",
+        "email": "aditya.padhy@ing.com",
+        "role": "product owner"
+    },
+    {
+        "id" : 3,
+        "name": "Aditya",
+        "email": "aditya.padhy@ing.com",
+        "role": "scrum master"
+    }
+]

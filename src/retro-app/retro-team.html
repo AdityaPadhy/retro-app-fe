@@ -1,24 +1,185 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api-column.html">
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 
 <dom-module id="retro-team">
   <template>
+    <style include="iron-flex iron-flex-alignment"></style>
     <style>
       :host {
         display: block;
         font-family: sans-serif;
       }
+
+      paper-input iron-icon {
+        color: var(--paper-grey-600);
+      }
+
+      paper-button {
+        margin-top: 1em;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        font-weight: normal;
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      paper-datatable-api {
+        --paper-datatable-api-checked-checkbox-color: black;
+      }
+
+      paper-dialog {
+        min-width: 70px;
+        min-height: 60px;
+        display: block;
+        font-family: sans-serif;
+        background: white;
+        color: black;
+        padding: 24px;
+        box-shadow: rgba(0, 0, 0, 0.24) -2px 5px 12px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+      }
+
+      paper-dialog paper-dialog-scrollable {
+        --paper-dialog-scrollable: {
+          box-sizing: border-box;
+          width: 500px;
+          height: 400px;
+        }
+      }
     </style>
 
-    <h1>Show the team</h1>
+    <iron-ajax auto url="http://api.jsonbin.io/b/5a7c19c17ecc1012733309cc/3" handle-as="json" last-response="{{data}}"></iron-ajax>
+
+    <paper-datatable-api paginate selectable filters data="{{data}}" page="{{page}}" size="{{size}}" available-size="[10, 20]"
+      on-sort="_handleSort" on-filter="_handleFilter" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
+      total-elements="[[totalElements]]" total-pages="[[totalPages]]" selectable-data-key="id">
+      <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable filter>
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column header="Email" type="String" property="email" sortable editable filter>
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column header="Role" type="String" property="role" sortable editable filter>
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+    </paper-datatable-api>
+
+    <center>
+      <paper-button raised class="green" on-tap="toggleDialog">Add a new member</paper-button>
+    </center>
+
+    <paper-dialog id="dialog">
+      <h2>Add a new team member</h2>
+      <paper-dialog-scrollable>
+        <paper-input always-float-label label="User Name"></paper-input>
+        <paper-input always-float-label label="email"></paper-input>
+        <paper-input always-float-label type="password" label="Password"></paper-input>
+        <paper-input always-float-label type="password" label="Confirm Password"></paper-input>
+        <paper-dropdown-menu label="Role">
+          <paper-listbox slot="dropdown-content" selected="1">
+            <paper-item>Developer</paper-item>
+            <paper-item>Product Owner</paper-item>
+            <paper-item>Scrum master</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus>Add</paper-button>
+      </div>
+    </paper-dialog>
   </template>
 
   <script>
     class RetroTeam extends Polymer.Element {
       static get is() { return 'retro-team'; }
       static get properties() {
-        return {        
+        return {
+          page: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_onChangePage'
+          },
+          size: {
+            type: Number,
+            value: 10,
+            notify: true,
+            observer: '_onChangeSize'
+          },
+          totalElements: {
+            type: Number,
+            value: 50,
+            notify: true
+          },
+          totalPages: {
+            type: Number,
+            value: 5,
+            notify: true
+          },
+          sortProperty: {
+            type: String,
+            notify: true
+          },
+          selectedRows: {
+            type: Array,
+            value: [],
+            notify: true
+          },
+          data: {
+            type: Array,
+            value: [],
+            notify: true
+          },
           rootPath: String
         };
+      }
+
+      toggleDialog() {
+        this.$.dialog.toggle();
+      }
+
+      _computeCurrentSize(page, size) {
+        console.log("compute");
+      }
+
+      _onChangeSize() {
+        console.log(this.size);
+      }
+
+      _onChangePage() {
+        console.log(this.page);
+      }
+
+      _handleSelectionChanged(event) {
+        console.log("selection chng");
+        console.log(event.detail.data);
+      }
+
+      _handleSort(event) {
+        console.log(event.detail.sort.property);
+        console.log(event.detail.sort.direction);
+        this.sortProperty = event.detail.sort.property + ',' + event.detail.sort.direction;
+      }
+
+      _handleFilter(event) {
+        console.log(event.detail.filter.value);
+        console.log(event.detail.filter.property);
       }
     }
 
