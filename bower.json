@@ -10,6 +10,7 @@
     "app-storage": "PolymerElements/app-storage#^2.0.2",
     "paper-input": "PolymerElements/paper-input#^2.1.1",
     "app-route": "PolymerElements/app-route#^2.0.3",
+    "iron-time": "cloudily/iron-time#^0.1.1",
     "iron-pages": "PolymerElements/iron-pages#^2.0.0",
     "iron-selector": "PolymerElements/iron-selector#^2.0.1",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0",
@@ -28,5 +29,9 @@
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
+  },
+  "resolutions": {
+    "polymer": "^2.0.0",
+    "webcomponentsjs": "^v1.0.19"
   }
 }
