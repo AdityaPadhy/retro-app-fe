@@ -1,0 +1,35 @@
+[
+    {
+        "id" : 1,
+        "status" : "ongoing",
+        "name" : "Sprint 1",
+        "team" : {
+          "id" : 1,
+          "name" : "Ouistiti"
+        },
+        "date" : {
+            "from" : "2018-02-26T09:00:00.511Z",
+            "to" : "2018-03-09T18:25:43.511Z"
+        },
+        "links" : {
+            "detail" : "/sprint/1"
+        }
+    },
+    {
+        "id" : 2,
+        "status" : "ongoing",
+        "name" : "Sprint 2",
+        "team" : {
+            "id" : 2,
+            "name" : "Camel"
+        },
+        "date" : {
+            "from" : "2018-02-26T09:00:00.511Z",
+            "to" : "2018-03-09T18:25:43.511Z"
+        },
+        "links" : {
+            "detail" : "/sprint/2"
+        }
+
+    }
+]
