@@ -10,6 +10,9 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-error.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
 
 
 <dom-module id="retro-team">
@@ -57,11 +60,36 @@
       }
     </style>
 
-    <iron-ajax auto url="http://api.jsonbin.io/b/5a7c19c17ecc1012733309cc/3" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <iron-ajax auto url="http://localhost:8080/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
 
-    <paper-datatable-api paginate selectable filters data="{{data}}" page="{{page}}" size="{{size}}" available-size="[10, 20]"
-      on-sort="_handleSort" on-filter="_handleFilter" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
-      total-elements="[[totalElements]]" total-pages="[[totalPages]]" selectable-data-key="id">
+    <iron-ajax 
+        id="addUser" 
+        method="PUT" 
+        body="{{putBody}}" 
+        handle-as="json" 
+        content-type="application/json" 
+        on-response="userAddSuccess"
+        last-response="{{addedUser}}" 
+        on-error="userAddError" 
+        last-error="{{userError}}" 
+        url="http://localhost:8080/user/add">
+    </iron-ajax>
+
+    <paper-datatable-api 
+      paginate
+      selectable 
+      filters 
+      data="{{data}}" 
+      page="{{page}}" 
+      size="{{size}}" 
+      available-size="[10, 20]"
+      on-sort="_handleSort" 
+      on-filter="_handleFilter" 
+      selected-rows={{selectedRows}} 
+      on-selection-changed="_handleSelectionChanged"
+      total-elements="[[totalElements]]" 
+      total-pages="[[totalPages]]" 
+      selectable-data-key="id">
       <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable filter>
         <template>
           <span>{{value}}</span>
@@ -83,14 +111,30 @@
       <paper-button raised class="green" on-tap="toggleDialog">Add a new member</paper-button>
     </center>
 
-    <paper-dialog id="dialog">
+    <paper-dialog id="dialog" backdrop  autoclosedisabled>
       <h2>Join Team</h2>
       <paper-dialog-scrollable>
-        <paper-input always-float-label label="User Name"></paper-input>
-        <paper-input always-float-label label="email"></paper-input>
-        <paper-input always-float-label type="password" label="Password"></paper-input>
-        <paper-input always-float-label type="password" label="Confirm Password"></paper-input>
-        <paper-dropdown-menu label="Role">
+          <paper-input-error slot="add-on">Only numbers are allowed!</paper-input-error>
+          <paper-input 
+          id="uname"
+          always-float-label 
+          label="User Name" 
+          value="{{putBody.name}}" 
+          validate="^[0-9]*$" 
+          auto-validate
+          error="Input is not a number!"
+          required>
+      </paper-input>
+      <paper-input 
+        always-float-label 
+        label="email" 
+        value="{{putBody.email}}">
+      </paper-input>
+          <!-- <paper-input-container id="userIn">
+             
+            </paper-input-container> -->
+        
+        <paper-dropdown-menu label="Role" value="{{putBody.role}}">
           <paper-listbox slot="dropdown-content" selected="1">
             <paper-item>Developer</paper-item>
             <paper-item>Product Owner</paper-item>
@@ -98,9 +142,10 @@
           </paper-listbox>
         </paper-dropdown-menu>
       </paper-dialog-scrollable>
+
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm autofocus>Add</paper-button>
+        <paper-button affirmative  autofocus on-tap="addTheUser">Add</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -146,8 +191,40 @@
             value: [],
             notify: true
           },
+          putBody: {
+            type: Object,
+            value: function() {
+              return {};
+            }
+          },
+          addedUser : {
+            type: Object
+          },
+          userError : {
+            type: Object
+          },
           rootPath: String
         };
+      }
+
+      addTheUser(event) {
+        let isUnameValid = this.$.uname.validate();
+        console.log(this.putBody);
+        if (isUnameValid) {
+          this.$.addUser.generateRequest();
+          this.$.dialog.close();
+        } else {
+          return true;
+        }        
+      }
+
+      userAddSuccess(event) {
+        console.log("User added in the database");
+        console.log(this.addedUser);
+      }
+
+      userAddError() {
+        console.log("User add error");
       }
 
       toggleDialog() {
