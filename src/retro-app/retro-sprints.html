@@ -15,7 +15,7 @@
     <h1>Show the sprints !</h1>
 
 
-    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]&filter=[[filterProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax>
 
     <paper-datatable-api
             paginate
@@ -86,6 +86,10 @@
                       type: String,
                       notify: true
                   },
+                  filterProperty: {
+                      type: String,
+                      notify: true
+                  },
                   selectedRows: {
                       type: Array,
                       value: [],
@@ -139,6 +143,7 @@
           _handleFilter(event) {
               console.log(event.detail.filter.value);
               console.log(event.detail.filter.property);
+              this.filterProperty = event.detail.filter.property + ',' + event.detail.filter.value;
           }
       }
 
