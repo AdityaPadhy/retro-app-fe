@@ -15,7 +15,7 @@
     <h1>Show the sprints !</h1>
 
 
-    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax>
 
     <paper-datatable-api
             paginate
@@ -56,7 +56,7 @@
 
 
   <script>
-      class RetroSprint extends Polymer.Element {
+      class RetroSprints extends Polymer.Element {
           static get is() { return 'retro-sprints'; }
           static get properties() {
               return {
@@ -130,6 +130,7 @@
           }
 
           _handleSort(event) {
+
               console.log(event.detail.sort.property);
               console.log(event.detail.sort.direction);
               this.sortProperty = event.detail.sort.property + ',' + event.detail.sort.direction;
@@ -141,6 +142,6 @@
           }
       }
 
-      window.customElements.define(RetroSprint.is, RetroSprint);
+      window.customElements.define(RetroSprints.is, RetroSprints);
   </script>
 </dom-module>
