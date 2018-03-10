@@ -60,47 +60,33 @@
       }
     </style>
 
-    <iron-ajax auto url="http://localhost:8080/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <iron-ajax id="getUser" auto url="http://localhost:8080/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
 
-    <iron-ajax 
-        id="addUser" 
-        method="PUT" 
-        body="{{putBody}}" 
-        handle-as="json" 
-        content-type="application/json" 
-        on-response="userAddSuccess"
-        last-response="{{addedUser}}" 
-        on-error="userAddError" 
-        last-error="{{userError}}" 
-        url="http://localhost:8080/user/add">
+    <iron-ajax id="addUser" method="PUT" body="{{putBody}}" handle-as="json" content-type="application/json"
+      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/add">
     </iron-ajax>
 
-    <paper-datatable-api 
-      paginate
-      selectable 
-      filters 
-      data="{{data}}" 
-      page="{{page}}" 
-      size="{{size}}" 
-      available-size="[10, 20]"
-      on-sort="_handleSort" 
-      on-filter="_handleFilter" 
-      selected-rows={{selectedRows}} 
-      on-selection-changed="_handleSelectionChanged"
-      total-elements="[[totalElements]]" 
-      total-pages="[[totalPages]]" 
+    <iron-ajax id="sortUser" method="POST" body="{{postBody}}" handle-as="json" content-type="application/json"
+      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/sort">
+    </iron-ajax>
+
+    <iron-ajax id="deleteUser" method="DELETE" body="{{deleteBody}}" handle-as="json" content-type="application/json"
+      on-response="deleteSuccess" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/delete">
+    </iron-ajax>
+
+    <paper-datatable-api selectable data="{{data}}" on-sort="_handleSort" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
       selectable-data-key="id">
-      <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable filter>
+      <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable>
         <template>
           <span>{{value}}</span>
         </template>
       </paper-datatable-api-column>
-      <paper-datatable-api-column header="Email" type="String" property="email" sortable editable filter>
+      <paper-datatable-api-column header="Email" type="String" property="email">
         <template>
           <span>{{value}}</span>
         </template>
       </paper-datatable-api-column>
-      <paper-datatable-api-column header="Role" type="String" property="role" sortable editable filter>
+      <paper-datatable-api-column header="Role" type="String" property="role">
         <template>
           <span>{{value}}</span>
         </template>
@@ -108,32 +94,18 @@
     </paper-datatable-api>
 
     <center>
-      <paper-button raised class="green" on-tap="toggleDialog">Add a new member</paper-button>
+      <paper-button raised class="green" on-tap="addNewMember">Add a new member</paper-button>
+      <paper-button raised class="red" on-tap="deleteUsers">Remove Selected Member</paper-button>
     </center>
 
-    <paper-dialog id="dialog" backdrop  autoclosedisabled>
+    <paper-dialog id="dialog" backdrop autoclosedisabled>
       <h2>Join Team</h2>
       <paper-dialog-scrollable>
-          <paper-input-error slot="add-on">Only numbers are allowed!</paper-input-error>
-          <paper-input 
-          id="uname"
-          always-float-label 
-          label="User Name" 
-          value="{{putBody.name}}" 
-          validate="^[0-9]*$" 
-          auto-validate
-          error="Input is not a number!"
-          required>
-      </paper-input>
-      <paper-input 
-        always-float-label 
-        label="email" 
-        value="{{putBody.email}}">
-      </paper-input>
-          <!-- <paper-input-container id="userIn">
-             
-            </paper-input-container> -->
-        
+        <paper-input id="uname" label="User Name" value="{{putBody.name}}" validate="^[A-Za-z0-9]*$" error-message="Are you Nuts!!!" required>
+        </paper-input>
+        <paper-input id="uemail" type="email" label="email" value="{{putBody.email}}" error-message = "Are you kidding me!!" required>
+        </paper-input>
+
         <paper-dropdown-menu label="Role" value="{{putBody.role}}">
           <paper-listbox slot="dropdown-content" selected="1">
             <paper-item>Developer</paper-item>
@@ -145,7 +117,7 @@
 
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button affirmative  autofocus on-tap="addTheUser">Add</paper-button>
+        <paper-button affirmative autofocus on-tap="addTheUser">Add</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -155,28 +127,6 @@
       static get is() { return 'retro-team'; }
       static get properties() {
         return {
-          page: {
-            type: Number,
-            value: 0,
-            notify: true,
-            observer: '_onChangePage'
-          },
-          size: {
-            type: Number,
-            value: 10,
-            notify: true,
-            observer: '_onChangeSize'
-          },
-          totalElements: {
-            type: Number,
-            value: 50,
-            notify: true
-          },
-          totalPages: {
-            type: Number,
-            value: 5,
-            notify: true
-          },
           sortProperty: {
             type: String,
             notify: true
@@ -191,16 +141,33 @@
             value: [],
             notify: true
           },
+          selectedIds : {
+            type: Array,
+            value: [],
+            notify: true
+          },
           putBody: {
             type: Object,
-            value: function() {
+            value: function () {
               return {};
             }
           },
-          addedUser : {
+          postBody: {
+            type: Object,
+            value: function () {
+              return {};
+            }
+          },
+          deleteBody: {
+            type: Object,
+            value: function () {
+              return {};
+            }
+          },
+          addedUser: {
             type: Object
           },
-          userError : {
+          userError: {
             type: Object
           },
           rootPath: String
@@ -209,54 +176,51 @@
 
       addTheUser(event) {
         let isUnameValid = this.$.uname.validate();
-        console.log(this.putBody);
-        if (isUnameValid) {
+        let isEmailValid = this.$.uemail.validate();
+        if (isUnameValid && isEmailValid) {
           this.$.addUser.generateRequest();
           this.$.dialog.close();
-        } else {
-          return true;
-        }        
-      }
-
-      userAddSuccess(event) {
-        console.log("User added in the database");
-        console.log(this.addedUser);
+        }
       }
 
       userAddError() {
         console.log("User add error");
       }
 
-      toggleDialog() {
+      addNewMember() {
+        this.set('putBody.name', null);
+        this.set('putBody.email', null);
+        this.$.uname.invalid = false;
+        this.$.uemail.invalid = false;
         this.$.dialog.toggle();
       }
 
-      _computeCurrentSize(page, size) {
-        console.log("compute");
-      }
-
-      _onChangeSize() {
-        console.log(this.size);
-      }
-
-      _onChangePage() {
-        console.log(this.page);
-      }
-
       _handleSelectionChanged(event) {
-        console.log("selection chng");
-        console.log(event.detail.data);
+        if (this.selectedIds.indexOf(event.detail.data.id) != -1) {
+          this.selectedIds.splice(this.selectedIds.indexOf(event.detail.data.id), 1);
+        } else {
+          this.selectedIds.push(event.detail.data.id);
+        }
+      }
+
+      deleteSuccess() {
+        console.log("Delete success");
+        this.selectedIds = [];
+        this.$.getUser.generateRequest();
+      }
+
+      deleteUsers() {
+        this.deleteBody.ids=this.selectedIds;
+        this.$.deleteUser.generateRequest();
       }
 
       _handleSort(event) {
+        console.log(this.data);
         console.log(event.detail.sort.property);
         console.log(event.detail.sort.direction);
         this.sortProperty = event.detail.sort.property + ',' + event.detail.sort.direction;
-      }
-
-      _handleFilter(event) {
-        console.log(event.detail.filter.value);
-        console.log(event.detail.filter.property);
+        this.postBody.sortKey = event.detail.sort.direction;
+        this.$.sortUser.generateRequest();
       }
     }
 
