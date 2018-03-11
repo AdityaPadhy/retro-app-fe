@@ -60,18 +60,18 @@
       }
     </style>
 
-    <iron-ajax id="getUser" auto url="http://localhost:8080/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <iron-ajax id="getUser" auto url="http://localhost:8888/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
 
     <iron-ajax id="addUser" method="PUT" body="{{putBody}}" handle-as="json" content-type="application/json"
-      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/add">
+      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/add">
     </iron-ajax>
 
     <iron-ajax id="sortUser" method="POST" body="{{postBody}}" handle-as="json" content-type="application/json"
-      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/sort">
+      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/sort">
     </iron-ajax>
 
-    <iron-ajax id="deleteUser" method="DELETE" body="{{deleteBody}}" handle-as="json" content-type="application/json"
-      on-response="deleteSuccess" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8080/user/delete">
+    <iron-ajax id="deleteUser" method="POST" body="{{deleteBody}}" handle-as="json" content-type="application/json"
+      on-response="deleteSuccess" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/delete">
     </iron-ajax>
 
     <paper-datatable-api selectable data="{{data}}" on-sort="_handleSort" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
@@ -118,6 +118,14 @@
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button affirmative autofocus on-tap="addTheUser">Add</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="confirmDialog" backdrop autoclosedisabled>
+      <h3>Dont say i did not warn you !!!</h3>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button affirmative autofocus on-tap="confirmRemoveUser">Remove</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -174,6 +182,7 @@
         };
       }
 
+
       addTheUser(event) {
         let isUnameValid = this.$.uname.validate();
         let isEmailValid = this.$.uemail.validate();
@@ -184,7 +193,7 @@
       }
 
       userAddError() {
-        console.log("User add error");
+        console.log("User error");
       }
 
       addNewMember() {
@@ -209,9 +218,18 @@
         this.$.getUser.generateRequest();
       }
 
+      confirmRemoveUser() {
+        if (this.selectedIds.length != 0) {
+          this.deleteBody.ids=this.selectedIds;
+          this.$.deleteUser.generateRequest();
+          this.$.confirmDialog.close();
+        }
+      }
+
       deleteUsers() {
-        this.deleteBody.ids=this.selectedIds;
-        this.$.deleteUser.generateRequest();
+        if(this.selectedIds.length != 0) {
+          this.$.confirmDialog.toggle();
+        }        
       }
 
       _handleSort(event) {
