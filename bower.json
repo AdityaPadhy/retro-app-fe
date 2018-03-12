@@ -23,7 +23,11 @@
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.1",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^2.0.2",
-    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0"
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
+    "d2l-alert": "BrightspaceUI/alert#^3.0.1",
+    "global-alert-wrapper": "roberttaraya/global-alert-wrapper#^1.0.3",
+    "granite-alert": "LostInBrittany/granite-alert#^1.2.0",
+    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

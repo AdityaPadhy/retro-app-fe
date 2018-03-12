@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-alert-dialog/paper-alert-dialog-icon-header.html">
+<link rel="import" href="../../bower_components/paper-alert-dialog/paper-alert-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
@@ -13,7 +15,6 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-error.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
-
 
 <dom-module id="retro-team">
   <template>
@@ -60,74 +61,90 @@
       }
     </style>
 
-    <iron-ajax id="getUser" auto url="http://localhost:8888/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <h2>The Team<h2>
 
-    <iron-ajax id="addUser" method="PUT" body="{{putBody}}" handle-as="json" content-type="application/json"
-      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/add">
-    </iron-ajax>
+        <paper-alert-dialog id="addConfirm" confirm-button="Got it">
+            <paper-alert-dialog-icon-header icon="icons:done">Well done!</paper-alert-dialog-icon-header>
+            Excellent, User Added
+          </paper-alert-dialog>
 
-    <iron-ajax id="sortUser" method="POST" body="{{postBody}}" handle-as="json" content-type="application/json"
-      last-response="{{data}}" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/sort">
-    </iron-ajax>
+          <paper-alert-dialog id="allfailed" confirm-button="Got it">
+              <paper-alert-dialog-icon-header style="color:red" icon="icons:error">Failed!</paper-alert-dialog-icon-header>
+              Failed. Server Error
+            </paper-alert-dialog>
+          
 
-    <iron-ajax id="deleteUser" method="POST" body="{{deleteBody}}" handle-as="json" content-type="application/json"
-      on-response="deleteSuccess" on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/delete">
-    </iron-ajax>
+        <iron-ajax id="getUser" auto url="http://localhost:8888/user/users" handle-as="json" last-response="{{data}}"></iron-ajax>
 
-    <paper-datatable-api selectable data="{{data}}" on-sort="_handleSort" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
-      selectable-data-key="id">
-      <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable>
-        <template>
-          <span>{{value}}</span>
-        </template>
-      </paper-datatable-api-column>
-      <paper-datatable-api-column header="Email" type="String" property="email">
-        <template>
-          <span>{{value}}</span>
-        </template>
-      </paper-datatable-api-column>
-      <paper-datatable-api-column header="Role" type="String" property="role">
-        <template>
-          <span>{{value}}</span>
-        </template>
-      </paper-datatable-api-column>
-    </paper-datatable-api>
+        <iron-ajax id="addUser" method="PUT" body="{{putBody}}" handle-as="json" content-type="application/json" on-response="addSuccess" last-response="{{data}}"
+          on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/add">
+        </iron-ajax>
 
-    <center>
-      <paper-button raised class="green" on-tap="addNewMember">Add a new member</paper-button>
-      <paper-button raised class="red" on-tap="deleteUsers">Remove Selected Member</paper-button>
-    </center>
+        <iron-ajax id="sortUser" method="POST" body="{{postBody}}" handle-as="json" content-type="application/json" last-response="{{data}}"
+          on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/sort">
+        </iron-ajax>
 
-    <paper-dialog id="dialog" backdrop autoclosedisabled>
-      <h2>Join Team</h2>
-      <paper-dialog-scrollable>
-        <paper-input id="uname" label="User Name" value="{{putBody.name}}" validate="^[A-Za-z0-9]*$" error-message="Are you Nuts!!!" required>
-        </paper-input>
-        <paper-input id="uemail" type="email" label="email" value="{{putBody.email}}" error-message = "Are you kidding me!!" required>
-        </paper-input>
+        <iron-ajax id="deleteUser" method="POST" body="{{deleteBody}}" handle-as="json" content-type="application/json" on-response="deleteSuccess"
+          on-error="userAddError" last-error="{{userError}}" url="http://localhost:8888/user/delete">
+        </iron-ajax>
 
-        <paper-dropdown-menu label="Role" value="{{putBody.role}}">
-          <paper-listbox slot="dropdown-content" selected="1">
-            <paper-item>Developer</paper-item>
-            <paper-item>Product Owner</paper-item>
-            <paper-item>Scrum master</paper-item>
-          </paper-listbox>
-        </paper-dropdown-menu>
-      </paper-dialog-scrollable>
+        <paper-datatable-api selectable data="{{data}}" on-sort="_handleSort" selected-rows={{selectedRows}} on-selection-changed="_handleSelectionChanged"
+          selectable-data-key="id">
+          <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable>
+            <template>
+              <span>{{value}}</span>
+            </template>
+          </paper-datatable-api-column>
+          <paper-datatable-api-column header="Email" type="String" property="email">
+            <template>
+              <span>{{value}}</span>
+            </template>
+          </paper-datatable-api-column>
+          <paper-datatable-api-column header="Role" type="String" property="role">
+            <template>
+              <span>{{value}}</span>
+            </template>
+          </paper-datatable-api-column>
+        </paper-datatable-api>
 
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button affirmative autofocus on-tap="addTheUser">Add</paper-button>
-      </div>
-    </paper-dialog>
+        <center>
+          <paper-button raised class="green" on-tap="addNewMember">Add a new member</paper-button>
+          <paper-button raised class="red" on-tap="deleteUsers">Remove Selected Member</paper-button>
+        </center>
 
-    <paper-dialog id="confirmDialog" backdrop autoclosedisabled>
-      <h3>Dont say i did not warn you !!!</h3>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button affirmative autofocus on-tap="confirmRemoveUser">Remove</paper-button>
-      </div>
-    </paper-dialog>
+        <paper-dialog id="dialog" backdrop autoclosedisabled>
+          <h2>Join Team</h2>
+          <paper-dialog-scrollable>
+            <paper-input id="uname" label="User Name" value="{{putBody.name}}" validate="^[A-Za-z0-9]*$" error-message="Are you Nuts!!!"
+              required>
+            </paper-input>
+            <paper-input id="uemail" type="email" label="email" value="{{putBody.email}}" error-message="Are you kidding me!!" required>
+            </paper-input>
+
+            <paper-dropdown-menu label="Role" value="{{putBody.role}}">
+              <paper-listbox slot="dropdown-content" selected="1">
+                <paper-item>Developer</paper-item>
+                <paper-item>Product Owner</paper-item>
+                <paper-item>Scrum master</paper-item>
+              </paper-listbox>
+            </paper-dropdown-menu>
+          </paper-dialog-scrollable>
+
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button affirmative autofocus on-tap="addTheUser">Add</paper-button>
+          </div>
+        </paper-dialog>
+
+        <paper-dialog id="confirmDialog" backdrop autoclosedisabled>
+          <h3>Dont say i did not warn you !!!</h3>
+          <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button affirmative autofocus on-tap="confirmRemoveUser">Remove</paper-button>
+          </div>
+        </paper-dialog>
+      
+      
   </template>
 
   <script>
@@ -149,7 +166,7 @@
             value: [],
             notify: true
           },
-          selectedIds : {
+          selectedIds: {
             type: Array,
             value: [],
             notify: true
@@ -192,8 +209,12 @@
         }
       }
 
+      addSuccess() {
+        this.$.addConfirm.open();
+      }
+
       userAddError() {
-        console.log("User error");
+        this.$.allfailed.open();
       }
 
       addNewMember() {
@@ -213,23 +234,22 @@
       }
 
       deleteSuccess() {
-        console.log("Delete success");
         this.selectedIds = [];
         this.$.getUser.generateRequest();
       }
 
       confirmRemoveUser() {
         if (this.selectedIds.length != 0) {
-          this.deleteBody.ids=this.selectedIds;
+          this.deleteBody.ids = this.selectedIds;
           this.$.deleteUser.generateRequest();
           this.$.confirmDialog.close();
         }
       }
 
       deleteUsers() {
-        if(this.selectedIds.length != 0) {
+        if (this.selectedIds.length != 0) {
           this.$.confirmDialog.toggle();
-        }        
+        }
       }
 
       _handleSort(event) {
