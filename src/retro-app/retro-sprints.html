@@ -1,4 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api-column.html">
+<link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api.html">
+<link rel="import" href="../../bower_components/iron-time/iron-time.html">
 
 <dom-module id="retro-sprints">
   <template>
@@ -9,19 +12,141 @@
       }
     </style>
 
-    <h1>Show the sprints</h1>
+    <h1>Show the sprints !</h1>
+
+
+    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]&filter=[[filterProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax>
+
+    <paper-datatable-api
+            paginate
+            filters
+            data="{{data}}"
+            page="{{page}}"
+            size="{{size}}"
+            available-size="[10, 20]"
+            on-sort="_handleSort"
+            on-filter="_handleFilter"
+            selected-rows={{selectedRows}}
+            on-selection-changed="_handleSelectionChanged"
+            total-elements="[[totalElements]]"
+            total-pages="[[totalPages]]"
+            selectable-data-key="id">
+      <paper-datatable-api-column draggable-column header="Name" type="String" property="name" sortable filter>
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column draggable-column header="Team" type="String" property="team.name" sortable filter>
+        <template>
+          <span>{{value}}</span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column draggable-column header="From" type="Date" property="date.from" sortable filter>
+        <template>
+          <span><iron-time datetime="{{value}}" format="dd/mm/yy"></iron-time></span>
+        </template>
+      </paper-datatable-api-column>
+      <paper-datatable-api-column draggable-column header="To" type="Date" property="date.to" sortable filter>
+        <template>
+          <span><iron-time datetime="{{value}}" format="dd/mm/yy"></iron-time></span>
+        </template>
+      </paper-datatable-api-column>
+    </paper-datatable-api>
   </template>
 
-  <script>
-    class RetroSprints extends Polymer.Element {
-      static get is() { return 'retro-sprints'; }
-      static get properties() {
-        return {        
-          rootPath: String
-        };
-      }
-    }
 
-    window.customElements.define(RetroSprints.is, RetroSprints);
+  <script>
+      class RetroSprints extends Polymer.Element {
+          static get is() { return 'retro-sprints'; }
+          static get properties() {
+              return {
+                  page: {
+                      type: Number,
+                      value: 0,
+                      notify: true,
+                      observer: '_onChangePage'
+                  },
+                  size: {
+                      type: Number,
+                      value: 10,
+                      notify: true,
+                      observer: '_onChangeSize'
+                  },
+                  totalElements: {
+                      type: Number,
+                      value: 50,
+                      notify: true
+                  },
+                  totalPages: {
+                      type: Number,
+                      value: 5,
+                      notify: true
+                  },
+                  sortProperty: {
+                      type: String,
+                      notify: true
+                  },
+                  filterProperty: {
+                      type: String,
+                      notify: true
+                  },
+                  selectedRows: {
+                      type: Array,
+                      value: [],
+                      notify: false
+                  },
+                  data: {
+                      type: Array,
+                      value: [],
+                      notify: true
+                  },
+                  putBody: {
+                      type: Object,
+                      value: function() {
+                          return {};
+                      }
+                  },
+                  addedSprint : {
+                      type: Object
+                  },
+                  sprintError : {
+                      type: Object
+                  },
+                  rootPath: String
+              };
+          }
+
+          _computeCurrentSize(page, size) {
+              console.log("compute");
+          }
+
+          _onChangeSize() {
+              console.log(this.size);
+          }
+
+          _onChangePage() {
+              console.log(this.page);
+          }
+
+          _handleSelectionChanged(event) {
+              console.log("selection chng");
+              console.log(event.detail.data);
+          }
+
+          _handleSort(event) {
+
+              console.log(event.detail.sort.property);
+              console.log(event.detail.sort.direction);
+              this.sortProperty = event.detail.sort.property + ',' + event.detail.sort.direction;
+          }
+
+          _handleFilter(event) {
+              console.log(event.detail.filter.value);
+              console.log(event.detail.filter.property);
+              this.filterProperty = event.detail.filter.property + ',' + event.detail.filter.value;
+          }
+      }
+
+      window.customElements.define(RetroSprints.is, RetroSprints);
   </script>
 </dom-module>
