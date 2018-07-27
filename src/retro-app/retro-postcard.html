@@ -1,0 +1,163 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="retro-postcard">
+  <template>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+    <style>
+      :host {
+        display: block;
+        font-family: sans-serif;
+      }
+
+      .child {
+        --layout-flex-ratio: 6;
+      }
+
+      .verticalLine {
+        border-left: thin solid black;
+      }
+
+      .labelTop {
+        background: none repeat scroll 0 0 white;
+        border: 1px solid black;
+        color: rgb(20, 20, 20);
+        font-size: 28px;
+        padding: 5px 15px;
+        margin-bottom: 20px;
+        right: -10px;
+        top: -10px;
+      }
+
+      .cardSection {
+        margin-top: 10px;
+        margin-left: 10px;
+      }
+
+
+    </style>
+
+    <div class="layout horizontal">
+
+      <div class="flex">
+        <center>
+          <div>
+            <label class="labelTop">START</label>
+          </div>  
+        </center>
+
+        <div class="cardSection">
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+    
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+        </div>      
+      </div>
+
+      <div class="flex verticalLine">
+        <center>
+          <div>
+            <label class="labelTop">STOP</label>
+          </div>         
+        </center>
+
+        <div class="cardSection">
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+    
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+        </div> 
+        
+      </div>
+
+
+      <div class="flex verticalLine">
+        <center>
+          <div>
+            <label class="labelTop">CONTINUE</label>
+          </div>          
+        </center>
+
+        <div class="cardSection">
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+    
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+          <div>adasd
+            sadasd
+            asda
+            asdadsadsa
+          </div>
+        </div> 
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class RetroPostcard extends Polymer.Element {
+      static get is() { return 'retro-postcard'; }
+      static get properties() {
+        return {
+          lists: {
+            type: Array,
+            value: [
+                {
+                  title : "title 1",
+                  description : "desc 1",
+                  type : "start",
+                  user : "username"
+                },
+                {
+                  title : "title 2",
+                  description : "desc 2",
+                  type : "start2",
+                  user : "username2"
+                },
+                {
+                  title : "title 3",
+                  description : "desc 3",
+                  type : "start3",
+                  user : "username3"
+                }
+              ],
+            notify: true
+          }
+        };
+      }
+    }
+
+    window.customElements.define(RetroPostcard.is, RetroPostcard);
+  </script>
+</dom-module>

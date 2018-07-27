@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api-column.html">
 <link rel="import" href="../../bower_components/paper-datatable-api/paper-datatable-api.html">
-<link rel="import" href="../../bower_components/iron-time/iron-time.html">
+<!-- <link rel="import" href="../../bower_components/iron-time/iron-time.html"> -->
 
 <dom-module id="retro-sprints">
   <template>
@@ -15,9 +15,9 @@
     <h1>Show the sprints !</h1>
 
 
-    <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]&filter=[[filterProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax>
+    <!-- <iron-ajax auto url="http://localhost:8081/src/retro-app/sprints.json?sort=[[sortProperty]]&filter=[[filterProperty]]" handle-as="json" last-response="{{data}}"></iron-ajax> -->
 
-    <paper-datatable-api
+    <!-- <paper-datatable-api
             paginate
             filters
             data="{{data}}"
@@ -51,7 +51,7 @@
           <span><iron-time datetime="{{value}}" format="dd/mm/yy"></iron-time></span>
         </template>
       </paper-datatable-api-column>
-    </paper-datatable-api>
+    </paper-datatable-api> -->
   </template>
 
 

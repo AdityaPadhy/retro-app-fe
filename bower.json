@@ -28,7 +28,8 @@
     "d2l-alert": "BrightspaceUI/alert#^3.0.1",
     "global-alert-wrapper": "roberttaraya/global-alert-wrapper#^1.0.3",
     "granite-alert": "LostInBrittany/granite-alert#^1.2.0",
-    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1"
+    "paper-alert-dialog": "Collaborne/paper-alert-dialog#^2.0.1",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.3"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
