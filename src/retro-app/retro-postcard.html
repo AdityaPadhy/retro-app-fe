@@ -1,6 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="retro-postcard">
   <template>
@@ -11,117 +16,118 @@
         font-family: sans-serif;
       }
 
-      .child {
-        --layout-flex-ratio: 6;
-      }
-
       .verticalLine {
         border-left: thin solid black;
       }
 
-      .labelTop {
-        background: none repeat scroll 0 0 white;
-        border: 1px solid black;
-        color: rgb(20, 20, 20);
-        font-size: 28px;
-        padding: 5px 15px;
-        margin-bottom: 20px;
-        right: -10px;
-        top: -10px;
+      paper-toolbar paper-icon-button {
+        background: rgb(207, 101, 101);
+        border-radius: 30px;
+        padding: 2px;
+        float:right;
       }
 
-      .cardSection {
-        margin-top: 10px;
-        margin-left: 10px;
+      paper-card {
+        margin: 5px 1px;
+        --paper-card: {
+          max-width: 300px;
+          box-sizing: border-box;
+        };
       }
 
+      .card-content {
+        max-width: 250px;
+        height: 70px;
+        overflow: auto;
+    }
 
     </style>
 
     <div class="layout horizontal">
 
       <div class="flex">
-        <center>
-          <div>
-            <label class="labelTop">START</label>
-          </div>  
-        </center>
+        <app-header-layout>          
+          <div>            
+            <paper-toolbar>
+              <div slot="middle" class="title">START</div>
+              <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
+            </paper-toolbar>
+          </div>
 
-        <div class="cardSection">
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
+          <div>
+            <paper-card>
+              <div class="card-content">This sprint we did dnot estimate all the task well. We should do it next time</div>
+              <div class="card-actions">
+                  <paper-icon-button icon="delete"></paper-icon-button>
+                  <paper-icon-button icon="create"></paper-icon-button>
+              </div>
+            </paper-card>
+
+            <paper-card>
+                <div class="card-content">This</div>
+                <div class="card-actions">
+                    <paper-icon-button icon="delete"></paper-icon-button>
+                    <paper-icon-button icon="create"></paper-icon-button>
+                </div>
+              </paper-card>
+              <paper-card>
+                  <div class="card-content">This</div>
+                  <div class="card-actions">
+                      <paper-icon-button icon="delete"></paper-icon-button>
+                      <paper-icon-button icon="create"></paper-icon-button>
+                  </div>
+                </paper-card>
+                <paper-card>
+                    <div class="card-content">This</div>
+                    <div class="card-actions">
+                        <paper-icon-button icon="delete"></paper-icon-button>
+                        <paper-icon-button icon="create"></paper-icon-button>
+                    </div>
+                  </paper-card>
           </div>
-    
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-        </div>      
+        </app-header-layout>
+
       </div>
 
       <div class="flex verticalLine">
-        <center>
           <div>
-            <label class="labelTop">STOP</label>
-          </div>         
-        </center>
+              <paper-toolbar slot="header">
+                <div slot="middle" class="title">STOP</div>
+                <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
+              </paper-toolbar>
+          </div>
 
-        <div class="cardSection">
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
+          <div>
+            <paper-card>
+              <div class="card-content">This is card description ffssfsfsfdsffssfsffsdf</div>
+              <div class="card-actions">
+                <paper-button>Delete</paper-button>
+                <paper-button>Edit</paper-button>
+              </div>
+            </paper-card>
           </div>
-    
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-        </div> 
-        
       </div>
 
 
       <div class="flex verticalLine">
-        <center>
           <div>
-            <label class="labelTop">CONTINUE</label>
-          </div>          
-        </center>
+              <paper-toolbar slot="header">
+                <div slot="middle" class="title">CONTINUE</div>
+                <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
+              </paper-toolbar>
+          </div>
 
-        <div class="cardSection">
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
+          <div>
+            <paper-card>
+              <div class="card-content">This is card description ffssfsfsfdsffssfsffsdf</div>
+              <div class="card-actions">
+                <paper-button>Delete</paper-button>
+                <paper-button>Edit</paper-button>
+              </div>
+            </paper-card>        
           </div>
-    
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-          <div>adasd
-            sadasd
-            asda
-            asdadsadsa
-          </div>
-        </div> 
       </div>
+
     </div>
   </template>
 
@@ -133,25 +139,25 @@
           lists: {
             type: Array,
             value: [
-                {
-                  title : "title 1",
-                  description : "desc 1",
-                  type : "start",
-                  user : "username"
-                },
-                {
-                  title : "title 2",
-                  description : "desc 2",
-                  type : "start2",
-                  user : "username2"
-                },
-                {
-                  title : "title 3",
-                  description : "desc 3",
-                  type : "start3",
-                  user : "username3"
-                }
-              ],
+              {
+                title: "title 1",
+                description: "desc 1",
+                type: "start",
+                user: "username"
+              },
+              {
+                title: "title 2",
+                description: "desc 2",
+                type: "start2",
+                user: "username2"
+              },
+              {
+                title: "title 3",
+                description: "desc 3",
+                type: "start3",
+                user: "username3"
+              }
+            ],
             notify: true
           }
         };
