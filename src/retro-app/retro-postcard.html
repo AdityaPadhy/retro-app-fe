@@ -6,6 +6,9 @@
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
 <dom-module id="retro-postcard">
   <template>
@@ -20,112 +23,126 @@
         border-left: thin solid black;
       }
 
-      paper-toolbar paper-icon-button {
+      app-toolbar {
+        background: darkblue;
+        color: white;
+      }
+
+      app-toolbar paper-icon-button {
         background: rgb(207, 101, 101);
         border-radius: 30px;
         padding: 2px;
-        float:right;
+        float: right;
       }
 
       paper-card {
-        margin: 5px 1px;
+        margin: 5px 5px;
         --paper-card: {
           max-width: 300px;
           box-sizing: border-box;
-        };
+        }
+        ;
       }
 
       .card-content {
         max-width: 250px;
         height: 70px;
         overflow: auto;
-    }
-
+      }
     </style>
+
+    <iron-ajax id="getCards" auto url="http://localhost:8888/postcard/cards" handle-as="json" last-response="{{data}}"></iron-ajax>
+
+    <iron-ajax id="deleteCard" method="DELETE" on-error="deleteFailed" last-error="{{deleteError}}" on-response="deleteSuccess"></iron-ajax>
+
+    <iron-ajax id="addCard" method="POST" url="http://localhost:8888/postcard/add" content-type="application/json" on-error="addFailed" last-error="{{addError}}"></iron-ajax>
+
+    <paper-dialog id="deleteFailed">
+      <p>There is an error while deleting the card</p>
+      <div class="buttons">
+        <paper-button dialog-confirm>close</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="addFailed">
+        <p>There is an error while adding the card</p>
+        <div class="buttons">
+          <paper-button dialog-confirm>close</paper-button>
+        </div>
+      </paper-dialog>
 
     <div class="layout horizontal">
 
       <div class="flex">
-        <app-header-layout>          
-          <div>            
-            <paper-toolbar>
-              <div slot="middle" class="title">START</div>
-              <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
-            </paper-toolbar>
+        <app-header-layout>
+          <div>
+            <app-toolbar>
+              <div main-title>START</div>
+              <paper-icon-button icon="add"></paper-icon-button>
+            </app-toolbar>
           </div>
 
           <div>
-            <paper-card>
-              <div class="card-content">This sprint we did dnot estimate all the task well. We should do it next time</div>
-              <div class="card-actions">
-                  <paper-icon-button icon="delete"></paper-icon-button>
-                  <paper-icon-button icon="create"></paper-icon-button>
-              </div>
-            </paper-card>
-
-            <paper-card>
-                <div class="card-content">This</div>
-                <div class="card-actions">
-                    <paper-icon-button icon="delete"></paper-icon-button>
-                    <paper-icon-button icon="create"></paper-icon-button>
-                </div>
-              </paper-card>
-              <paper-card>
-                  <div class="card-content">This</div>
+            <dom-repeat items="{{data}}" filter="isStart">
+              <template>
+                <paper-card>
+                  <div class="card-content">{{item.description}}</div>
                   <div class="card-actions">
-                      <paper-icon-button icon="delete"></paper-icon-button>
-                      <paper-icon-button icon="create"></paper-icon-button>
+                    <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
+                    <paper-icon-button icon="create"></paper-icon-button>
                   </div>
                 </paper-card>
-                <paper-card>
-                    <div class="card-content">This</div>
-                    <div class="card-actions">
-                        <paper-icon-button icon="delete"></paper-icon-button>
-                        <paper-icon-button icon="create"></paper-icon-button>
-                    </div>
-                  </paper-card>
+              </template>
+            </dom-repeat>
           </div>
         </app-header-layout>
-
       </div>
 
       <div class="flex verticalLine">
-          <div>
-              <paper-toolbar slot="header">
-                <div slot="middle" class="title">STOP</div>
-                <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
-              </paper-toolbar>
-          </div>
+        <div>
+          <app-toolbar>
+            <div main-title>STOP</div>
+            <paper-icon-button icon="add"></paper-icon-button>
+          </app-toolbar>
+        </div>
 
-          <div>
-            <paper-card>
-              <div class="card-content">This is card description ffssfsfsfdsffssfsffsdf</div>
-              <div class="card-actions">
-                <paper-button>Delete</paper-button>
-                <paper-button>Edit</paper-button>
-              </div>
-            </paper-card>
-          </div>
+        <div>
+          <dom-repeat items="{{data}}" filter="isStop">
+            <template>
+              <paper-card>
+                <div class="card-content">{{item.description}}</div>
+                <div class="card-actions">
+                  <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
+                  <paper-icon-button icon="create"></paper-icon-button>
+                </div>
+              </paper-card>
+            </template>
+          </dom-repeat>
+        </div>
       </div>
 
 
       <div class="flex verticalLine">
-          <div>
-              <paper-toolbar slot="header">
-                <div slot="middle" class="title">CONTINUE</div>
-                <div slot="middle" class="title"><paper-icon-button icon="add"></paper-icon-button></div>
-              </paper-toolbar>
-          </div>
+        <div>
+          <app-toolbar>
+            <div main-title>CONTINUE</div>
+            <paper-icon-button icon="add"></paper-icon-button>
+          </app-toolbar>
+        </div>
 
-          <div>
-            <paper-card>
-              <div class="card-content">This is card description ffssfsfsfdsffssfsffsdf</div>
-              <div class="card-actions">
-                <paper-button>Delete</paper-button>
-                <paper-button>Edit</paper-button>
-              </div>
-            </paper-card>        
-          </div>
+        <div>
+          <dom-repeat items="{{data}}" filter="isContinue">
+            <template>
+              <paper-card>
+                <div class="card-content">{{item.description}}</div>
+                <div class="card-actions">
+                  <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
+                  <paper-icon-button icon="create"></paper-icon-button>
+                </div>
+              </paper-card>
+            </template>
+          </dom-repeat>
+        </div>
       </div>
 
     </div>
@@ -133,34 +150,58 @@
 
   <script>
     class RetroPostcard extends Polymer.Element {
-      static get is() { return 'retro-postcard'; }
+      static get is() {
+        return 'retro-postcard';
+      }
+
       static get properties() {
         return {
-          lists: {
+          data: {
             type: Array,
-            value: [
-              {
-                title: "title 1",
-                description: "desc 1",
-                type: "start",
-                user: "username"
-              },
-              {
-                title: "title 2",
-                description: "desc 2",
-                type: "start2",
-                user: "username2"
-              },
-              {
-                title: "title 3",
-                description: "desc 3",
-                type: "start3",
-                user: "username3"
-              }
-            ],
+            value: [],
             notify: true
+          },
+          deleteError: {
+            type: Object
+          },
+          addError : {
+            type: Object
           }
         };
+      }
+
+      isStart(item) {
+        return item.type.toUpperCase() == 'START';
+      }
+
+      isStop(item) {
+        return item.type.toUpperCase() == 'STOP';
+      }
+
+      isContinue(item) {
+        return item.type.toUpperCase() == 'CONTINUE';
+      }
+
+      deletePostcard(event) {
+        this.$.deleteCard.set('url', 'http://localhost:8888/postcard/delete/' + event.model.__data.item.id);
+        this.$.deleteCard.generateRequest();
+      }
+
+      deleteFailed() {
+        this.$.deleteFailed.toggle();
+      }
+
+      deleteSuccess() {
+        this.$.getCards.generateRequest();
+      }
+
+      addPostcard(event) {
+        this.$.addCard.generateRequest();
+      }
+
+      addFailed() {
+        this.$.addCard.set('body', {});
+        this.$.addFailed.toggle();
       }
     }
 
