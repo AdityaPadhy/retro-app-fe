@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="retro-postcard">
   <template>
@@ -44,6 +45,37 @@
         ;
       }
 
+      paper-dialog {
+        min-width: 50px;
+        min-height: 50px;
+        display: block;
+        font-family: sans-serif;
+        background: white;
+        color: black;
+        padding: 24px;
+        box-shadow: rgba(0, 0, 0, 0.24) -2px 5px 12px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+      }
+
+      paper-dialog paper-dialog-scrollable {
+        --paper-dialog-scrollable: {
+          box-sizing: border-box;
+          width: 400px;
+          height: 300px;
+        }
+      }
+
+      .submitBtn paper-button {
+        background: blue;
+        min-width: 150px;
+        min-height: 50px;
+        margin-top: 1em;
+        color : white;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        font-weight: bold;
+        font-size: 20px;
+        -webkit-font-smoothing: antialiased;
+      }
+
       .card-content {
         max-width: 250px;
         height: 70px;
@@ -55,21 +87,66 @@
 
     <iron-ajax id="deleteCard" method="DELETE" on-error="deleteFailed" last-error="{{deleteError}}" on-response="deleteSuccess"></iron-ajax>
 
-    <iron-ajax id="addCard" method="POST" url="http://localhost:8888/postcard/add" content-type="application/json" on-error="addFailed" last-error="{{addError}}"></iron-ajax>
+    <iron-ajax id="addCard" method="PUT" body="{{addItem}}" url="http://localhost:8888/postcard/add" content-type="application/json"
+      on-error="addFailed" on-response="addSuccess" last-error="{{addError}}"></iron-ajax>
 
-    <paper-dialog id="deleteFailed">
+    <iron-ajax id="updateCard" method="POST" body="{{updateItem}}" url="http://localhost:8888/postcard/update" content-type="application/json"
+      on-error="updateFailed" on-response="updateSuccess" last-error="{{addError}}"></iron-ajax>
+
+    <paper-dialog id="deleteFailedDialog">
       <p>There is an error while deleting the card</p>
       <div class="buttons">
         <paper-button dialog-confirm>close</paper-button>
       </div>
     </paper-dialog>
 
-    <paper-dialog id="addFailed">
-        <p>There is an error while adding the card</p>
-        <div class="buttons">
-          <paper-button dialog-confirm>close</paper-button>
-        </div>
-      </paper-dialog>
+    <paper-dialog id="addFailedDialog">
+      <p>There is an error while adding the card</p>
+      <div class="buttons">
+        <paper-button dialog-confirm>close</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="updateFailedDialog">
+      <p>There is an error while updating the card</p>
+      <div class="buttons">
+        <paper-button dialog-confirm>close</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="addDialog" backdrop autoclosedisabled>
+      <h2>Add new item</h2>
+      <paper-dialog-scrollable>
+        <paper-input id="title" label="Title" value="{{addItem.header}}" validate="^[A-Za-z0-9]*$" error-message="Enter the title"
+          required>
+        </paper-input>
+        <paper-textarea id="description" label="Description" value="{{addItem.description}}" validate="^[A-Za-z0-9]*$" error-message="Please enter the description"
+          required>
+        </paper-textarea>
+      </paper-dialog-scrollable>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button affirmative autofocus on-tap="addPostcard">Add</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="updateDialog" backdrop autoclosedisabled>
+      <h2>Update item</h2>
+      <paper-dialog-scrollable>
+        <paper-input id="updateTitle" label="Title" value="{{updateItem.header}}" validate="^[A-Za-z0-9]*$" error-message="Enter the title"
+          required>
+        </paper-input>
+        <paper-textarea id="updateDescription" label="Description" value="{{updateItem.description}}" validate="^[A-Za-z0-9]*$" error-message="Please enter the description"
+          required>
+        </paper-textarea>
+      </paper-dialog-scrollable>
+
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button affirmative autofocus on-tap="updatePostCardItem">Update</paper-button>
+      </div>
+    </paper-dialog>
 
     <div class="layout horizontal">
 
@@ -78,18 +155,18 @@
           <div>
             <app-toolbar>
               <div main-title>START</div>
-              <paper-icon-button icon="add"></paper-icon-button>
+              <paper-icon-button icon="add" on-tap="addStartItem"></paper-icon-button>
             </app-toolbar>
           </div>
 
           <div>
-            <dom-repeat items="{{data}}" filter="isStart">
+            <dom-repeat id="random" items="{{data}}" filter="isStart">
               <template>
                 <paper-card>
                   <div class="card-content">{{item.description}}</div>
                   <div class="card-actions">
                     <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
-                    <paper-icon-button icon="create"></paper-icon-button>
+                    <paper-icon-button icon="create" on-tap="updatePostCard"></paper-icon-button>
                   </div>
                 </paper-card>
               </template>
@@ -102,7 +179,7 @@
         <div>
           <app-toolbar>
             <div main-title>STOP</div>
-            <paper-icon-button icon="add"></paper-icon-button>
+            <paper-icon-button icon="add" on-tap="addStopItem"></paper-icon-button>
           </app-toolbar>
         </div>
 
@@ -113,7 +190,7 @@
                 <div class="card-content">{{item.description}}</div>
                 <div class="card-actions">
                   <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
-                  <paper-icon-button icon="create"></paper-icon-button>
+                  <paper-icon-button icon="create" on-tap="updatePostCard"></paper-icon-button>
                 </div>
               </paper-card>
             </template>
@@ -126,7 +203,7 @@
         <div>
           <app-toolbar>
             <div main-title>CONTINUE</div>
-            <paper-icon-button icon="add"></paper-icon-button>
+            <paper-icon-button icon="add" on-tap="addContinueItem"></paper-icon-button>
           </app-toolbar>
         </div>
 
@@ -137,7 +214,7 @@
                 <div class="card-content">{{item.description}}</div>
                 <div class="card-actions">
                   <paper-icon-button icon="delete" on-tap="deletePostcard"></paper-icon-button>
-                  <paper-icon-button icon="create"></paper-icon-button>
+                  <paper-icon-button icon="create" on-tap="updatePostCard"></paper-icon-button>
                 </div>
               </paper-card>
             </template>
@@ -146,6 +223,13 @@
       </div>
 
     </div>
+
+    <div class="submitBtn">
+      <center>
+        <paper-button raised class="green" on-tap="submitCards">Submit All Cards</paper-button>
+      </center>
+    </div>
+
   </template>
 
   <script>
@@ -164,10 +248,26 @@
           deleteError: {
             type: Object
           },
-          addError : {
+          addError: {
             type: Object
+          },
+          addItem: {
+            type: Object,
+            value: function () {
+              return {};
+            }
+          },
+          updateItem: {
+            type: Object,
+            value: function () {
+              return {};
+            }
           }
         };
+      }
+
+      submitCards() {
+        console.log("Submit all");
       }
 
       isStart(item) {
@@ -187,8 +287,13 @@
         this.$.deleteCard.generateRequest();
       }
 
+      updatePostCard(event) {
+        this.updateItem = event.model.__data.item;
+        this.$.updateDialog.toggle();
+      }
+
       deleteFailed() {
-        this.$.deleteFailed.toggle();
+        this.$.deleteFailedDialog.toggle();
       }
 
       deleteSuccess() {
@@ -196,12 +301,63 @@
       }
 
       addPostcard(event) {
-        this.$.addCard.generateRequest();
+        let isTitleValid = this.$.title.validate();
+        let isDescValid = this.$.description.validate();
+        if (isTitleValid && isDescValid) {
+          this.$.addCard.generateRequest();
+          this.$.addDialog.close();
+        }
+      }
+
+      updatePostCardItem(event) {
+        let isTitleValid = this.$.updateTitle.validate();
+        let isDescValid = this.$.updateDescription.validate();
+        if (isTitleValid && isDescValid) {
+          this.$.updateCard.generateRequest();
+          this.$.updateDialog.close();
+        }
+      }
+
+      addStartItem() {
+        this.addItem = {};
+        this.$.title.invalid = false;
+        this.$.description.invalid = false;
+        this.addItem.type = "START";
+        this.$.addDialog.toggle();
+      }
+
+      addContinueItem() {
+        this.addItem = {};
+        this.$.title.invalid = false;
+        this.$.description.invalid = false;
+        this.addItem.type = "CONTINUE";
+        this.$.addDialog.toggle();
+      }
+
+      addStopItem() {
+        this.addItem = {};
+        this.$.title.invalid = false;
+        this.$.description.invalid = false;
+        this.addItem.type = "STOP";
+        this.$.addDialog.toggle();
       }
 
       addFailed() {
         this.$.addCard.set('body', {});
-        this.$.addFailed.toggle();
+        this.$.addFailedDialog.toggle();
+      }
+
+      updateFailed() {
+        this.$.updateCard.set('body', {});
+        this.$.updateFailedDialog.toggle();
+      }
+
+      updateSuccess() {
+        this.$.getCards.generateRequest();
+      }
+
+      addSuccess() {
+        this.$.getCards.generateRequest();
       }
     }
 

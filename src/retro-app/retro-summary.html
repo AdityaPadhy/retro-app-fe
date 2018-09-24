@@ -1,0 +1,347 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+
+<dom-module id="retro-summary">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block;
+                font-family: sans-serif;
+            }
+
+            .verticalLine {
+                border-left: thin solid black;
+            }
+
+            app-toolbar {
+                background: rgb(147, 231, 144);
+                color: rgb(17, 9, 9);
+            }
+
+            app-toolbar paper-icon-button {
+                background: rgb(207, 101, 101);
+                border-radius: 30px;
+                padding: 2px;
+                float: right;
+            }
+
+            paper-card {
+                margin: 5px 5px;
+                --paper-card: {
+                    max-width: 300px;
+                    box-sizing: border-box;
+                }
+                ;
+            }
+
+            paper-dialog {
+                min-width: 50px;
+                min-height: 50px;
+                display: block;
+                font-family: sans-serif;
+                background: white;
+                color: black;
+                padding: 24px;
+                box-shadow: rgba(0, 0, 0, 0.24) -2px 5px 12px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+            }
+
+            paper-dialog paper-dialog-scrollable {
+                --paper-dialog-scrollable: {
+                    box-sizing: border-box;
+                    width: 600px;
+                    height: 300px;
+                }
+            }
+
+            .submitBtn paper-button {
+                background: blue;
+                min-width: 250px;
+                min-height: 50px;
+                margin-top: 1em;
+                color: white;
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-weight: bold;
+                font-size: 20px;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .card-content {
+                max-width: 250px;
+                height: 70px;
+                overflow: auto;
+            }
+        </style>
+
+        <iron-ajax id="getCards" auto url="http://localhost:8888/postcard/cards" handle-as="json" last-response="{{data}}"></iron-ajax>
+
+        <iron-ajax id="getActionsById" handle-as="json" last-response="{{actionById}}" on-error="getActionFailed" on-response="getActionSuccess"></iron-ajax>
+
+        <iron-ajax id="updateCard" method="POST" body="{{updateItem}}" url="http://localhost:8888/postcard/update" content-type="application/json"
+            on-error="updateFailed" on-response="updateSuccess" last-error="{{addError}}"></iron-ajax>
+
+        <paper-dialog id="updateFailedDialog">
+            <p>There is an error while updating the card</p>
+            <div class="buttons">
+                <paper-button dialog-confirm>close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="getActionFailedDialog">
+            <p>There is an error while fetching all the actions</p>
+            <div class="buttons">
+                <paper-button dialog-confirm>close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="actionDialog" backdrop autoclosedisabled>
+            <h2>Actions</h2>
+            <paper-dialog-scrollable>
+                <div>
+                    <dom-repeat id="action" items="{{actionById}}">
+                        <template>
+                            <div role="listbox">
+                                <paper-icon-item>
+                                    <paper-item-body three-line>
+                                        <div>
+                                            <iron-icon icon="receipt" slot="item-icon"></iron-icon>{{item.what}}</div>
+                                        <div secondary>
+                                            <iron-icon icon="perm-identity" slot="item-icon"></iron-icon>{{item.who}}</div>
+                                        <div secondary>
+                                            <iron-icon icon="watch-later" slot="item-icon"></iron-icon>{{item.when}}</div>
+                                    </paper-item-body>
+                                    <paper-icon-button icon="pageview"></paper-icon-button>
+                                    <paper-icon-button icon="delete"></paper-icon-button>
+                                    <paper-icon-button icon="check"></paper-icon-button>                                
+                                </paper-icon-item>
+                            </div>
+                        </template>
+                    </dom-repeat>
+                </div>
+            </paper-dialog-scrollable>
+
+            <div class="buttons">
+                <paper-button dialog-dismiss on-tap="clearAction">Cancel</paper-button>
+                <paper-button affirmative autofocus on-tap="addAction">Add New</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="addDialog" backdrop autoclosedisabled>
+            <h2>Actions</h2>
+            <paper-dialog-scrollable>
+                <!-- <paper-icon-button icon="build"></paper-icon-button>   -->
+                <paper-input id="what" label="what" value="{{addItem.what}}" validate="^[A-Za-z0-9]*$" error-message="Enter the title" required>
+                </paper-input>
+                <paper-input id="who" label="who" value="{{addItem.who}}" validate="^[A-Za-z0-9]*$" error-message="Enter the title" required>
+                </paper-input>
+                <paper-input id="when" label="when" value="{{addItem.when}}" validate="^[A-Za-z0-9]*$" error-message="Enter the title" required>
+                </paper-input>
+            </paper-dialog-scrollable>
+
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button affirmative autofocus on-tap="saveAction">Save</paper-button>
+            </div>
+        </paper-dialog>
+
+        <div class="layout horizontal">
+
+            <div class="flex">
+                <app-header-layout>
+                    <div>
+                        <app-toolbar>
+                            <div main-title>START</div>
+                        </app-toolbar>
+                    </div>
+
+                    <div>
+                        <dom-repeat id="random" items="{{data}}" filter="isStart">
+                            <template>
+                                <paper-card>
+                                    <div class="card-content">{{item.description}}</div>
+                                    <template is="dom-if" if="{{!item.isMarkedDone}}">
+                                        <div class="card-actions">
+                                            <template is="dom-if" if="{{!item.isMarkedAction}}">
+                                                <paper-icon-button icon="check" on-tap="updatePostCard"></paper-icon-button>
+                                            </template>
+                                            <paper-icon-button icon="build" on-tap="getAllActionsById"></paper-icon-button>
+                                        </div>
+                                    </template>
+                                </paper-card>
+                            </template>
+                        </dom-repeat>
+                    </div>
+                </app-header-layout>
+            </div>
+
+            <div class="flex verticalLine">
+                <div>
+                    <app-toolbar>
+                        <div main-title>STOP</div>
+                    </app-toolbar>
+                </div>
+
+                <div>
+                    <dom-repeat items="{{data}}" filter="isStop">
+                        <template>
+                            <paper-card>
+                                <div class="card-content">{{item.description}}</div>
+                                <template is="dom-if" if="{{!item.isMarkedDone}}">
+                                    <div class="card-actions">
+                                        <template is="dom-if" if="{{!item.isMarkedAction}}">
+                                            <paper-icon-button icon="check" on-tap="updatePostCard"></paper-icon-button>
+                                        </template>
+                                        <paper-icon-button icon="build" on-tap="getAllActionsById"></paper-icon-button>
+                                    </div>
+                                </template>
+                            </paper-card>
+                        </template>
+                    </dom-repeat>
+                </div>
+            </div>
+
+
+            <div class="flex verticalLine">
+                <div>
+                    <app-toolbar>
+                        <div main-title>CONTINUE</div>
+                    </app-toolbar>
+                </div>
+
+                <div>
+                    <dom-repeat items="{{data}}" filter="isContinue">
+                        <template>
+                            <paper-card>
+                                <div class="card-content">{{item.description}}</div>
+                                <template is="dom-if" if="{{!item.isMarkedDone}}">
+                                    <div class="card-actions">
+                                        <template is="dom-if" if="{{!item.isMarkedAction}}">
+                                            <paper-icon-button icon="check" on-tap="updatePostCard"></paper-icon-button>
+                                        </template>
+                                        <paper-icon-button icon="build" on-tap="getAllActionsById"></paper-icon-button>
+                                    </div>
+                                </template>
+                            </paper-card>
+                        </template>
+                    </dom-repeat>
+                </div>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+        class RetroSummary extends Polymer.Element {
+            static get is() {
+                return 'retro-summary';
+            }
+
+            static get properties() {
+                return {
+                    data: {
+                        type: Array,
+                        value: [],
+                        notify: true
+                    },
+                    actionById: {
+                        type: Array,
+                        value: [],
+                        notify: true
+                    },
+                    deleteError: {
+                        type: Object
+                    },
+                    addError: {
+                        type: Object
+                    },
+                    addItem: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+                    updateItem: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+                    lastId: {
+                        type: String,
+                        value:""
+                    }
+                };
+            }
+
+            submitCards() {
+                console.log("Submit all");
+            }
+
+            isStart(item) {
+                return item.type.toUpperCase() == 'START' && !item.isMarkedDone;
+            }
+
+            isStop(item) {
+                return item.type.toUpperCase() == 'STOP' && !item.isMarkedDone;
+            }
+
+            isContinue(item) {
+                return item.type.toUpperCase() == 'CONTINUE' && !item.isMarkedDone;
+            }
+
+            updatePostCard(event) {
+                this.updateItem = event.model.__data.item;
+                this.updateItem.isMarkedDone = true;
+                this.$.updateCard.generateRequest();
+            }
+
+            updateFailed() {
+                this.$.updateCard.set('body', {});
+                this.$.updateFailedDialog.toggle();
+            }
+
+            updateSuccess() {
+                this.$.getCards.generateRequest();
+            }
+
+            getAllActionsById(event) {
+                //this.actionById = {};
+                this.$.getActionsById.set('url', 'http://localhost:8888/actions/' + event.model.__data.item.id);
+                this.$.getActionsById.generateRequest();
+            }
+
+            getActionFailed() {
+                this.$.getActionFailedDialog.toggle();
+            }
+
+            getActionSuccess() {
+                this.$.actionDialog.toggle();
+            }
+
+            clearAction() {
+                //this.actionById = {};
+            }
+
+            addAction(event) {
+                    log.console("gg");
+            }
+
+        }
+
+        window.customElements.define(RetroSummary.is, RetroSummary);
+    </script>
+</dom-module>
